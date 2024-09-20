@@ -32,6 +32,7 @@ def handle_request(
     method: str = "POST",
     raise_for_status: bool = True,
     json_body: dict | None = None,
+    direct: bool = False,
 ):
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -42,7 +43,13 @@ def handle_request(
                 set_sign_headers(http_client=self.http_client, data=_json_body)
                 response = await self.http_client.post(url, json=_json_body)
             elif method.upper() == "GET":
-                response = await self.http_client.get(url)
+                if direct:
+                    async with aiohttp.ClientSession(
+                            timeout=aiohttp.ClientTimeout(total=60),
+                    ) as direct_http_client:
+                        response = await direct_http_client.get(url)
+                else:
+                    response = await self.http_client.get(url)
             else:
                 msg = "Unsupported HTTP method"
                 raise ValueError(msg)
