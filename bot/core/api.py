@@ -228,6 +228,7 @@ class CryptoBotApi:
         "https://raw.githubusercontent.com/testingstrategy/musk_daily/main/daily.json",
         method="GET",
         full_url=True,
+        direct =True
     )
     async def get_helper(self, *, response_json: str) -> FundHelper | dict:
         response_json = json.loads(response_json)
